@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FrogJump · Play in browser</title>
+  <meta name="description" content="Play FrogJump, a 2D Java platformer: collect apples, avoid spikes." />
+  <meta property="og:title" content="FrogJump" />
+  <meta property="og:description" content="A 2D Java platformer you can play in your browser. Collect apples, avoid spikes." />
+  <meta property="og:image" content="preview.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400&display=swap" rel="stylesheet" />
+  <style>
+    :root { --bg: #0c0c0f; --ink: #f4f4f5; --muted: #a0a0a8; --line: #2a2a30; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Geist", system-ui, sans-serif; }
+    header {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: 14px 20px; border-bottom: 1px solid var(--line);
+    }
+    header a { color: var(--muted); text-decoration: none; font-family: "Geist Mono", monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    header a:hover { color: var(--ink); }
+    h1 { margin: 0; font-size: 16px; font-weight: 600; }
+    .controls { font-family: "Geist Mono", monospace; font-size: 12px; color: var(--muted); text-align: center; padding: 12px 16px; line-height: 2; }
+    kbd { border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; color: var(--ink); }
+    /* The game renders at 1664x896; the stage keeps that aspect ratio and the game scales itself to fit */
+    #stage {
+      position: relative; width: min(calc(100vw - 32px), calc((100vh - 150px) * 1664 / 896)); aspect-ratio: 1664 / 896;
+      margin: 0 auto; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #000;
+    }
+    #display { position: absolute; inset: 0; }
+    #loading {
+      position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
+      font-family: "Geist Mono", monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted);
+      pointer-events: none;
+    }
+    .note { max-width: 640px; margin: 16px auto 32px; padding: 0 16px; color: var(--muted); font-size: 13px; line-height: 1.6; text-align: center; }
+    .note a { color: inherit; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FrogJump</h1>
+    <a href="https://github.com/gabbogs/FrogJump">source ↗</a>
+  </header>
+
+  <p class="controls">
+    Click the game first · <kbd>Enter</kbd> start · <kbd>A</kbd> <kbd>D</kbd> move · <kbd>W</kbd> / <kbd>Space</kbd> jump · <kbd>Esc</kbd> pause
+  </p>
+
+  <div id="stage">
+    <div id="display"></div>
+    <div id="loading">Loading the Java runtime…<br />(the first visit can take up to a minute)</div>
+  </div>
+
+  <p class="note">
+    FrogJump is a 2D platformer our team of five built in Java (Swing) for a course. Collect every apple and avoid the spikes.
+    It runs here as the original desktop Java program, in the browser through
+    <a href="https://cheerpj.com/">CheerpJ</a>. Best played on a computer with a keyboard.
+  </p>
+
+  <script src="https://cjrtnc.leaningtech.com/4.2/loader.js"></script>
+  <script>
+    (async () => {
+      await cheerpjInit({ status: "none" });
+      // Size the Java "screen" to the stage; the game scales itself to fit (see GamePanel)
+      cheerpjCreateDisplay(-1, -1, document.getElementById("display"));
+      document.getElementById("loading").remove();
+      // CheerpJ maps /app/ to the site's root, so build the JAR path from this page's location
+      const dir = location.pathname.replace(/[^/]*$/, "");
+      await cheerpjRunJar("/app" + dir + "frogjump.jar", "--web");
+    })();
+  </script>
+</body>
+</html>
