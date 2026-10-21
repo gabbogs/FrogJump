@@ -17,6 +17,8 @@ public class SoundLoader {
 
 	private static final List<Clip> clips = new ArrayList<>();
 	private static float volume = 0.7f;
+	// Restored when unmuting
+	private static float volumeBeforeMute = volume;
 
 	public static Clip load(String fileName) {
 		try {
@@ -54,9 +56,20 @@ public class SoundLoader {
 	public static void setVolume(float newVolume) {
 		synchronized (clips) {
 			volume = Math.max(0, Math.min(1, newVolume));
+			if (volume > 0)
+				volumeBeforeMute = volume;
 			for (Clip clip : clips)
 				applyVolume(clip);
 		}
+	}
+
+	public static boolean isMuted() {
+		return volume <= 0;
+	}
+
+	public static void toggleMute() {
+		// If the slider was dragged nearly to zero before muting, unmute to a volume you can hear
+		setVolume(isMuted() ? Math.max(volumeBeforeMute, 0.3f) : 0);
 	}
 
 	private static void applyVolume(Clip clip) {

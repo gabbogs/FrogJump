@@ -12,12 +12,14 @@ import java.util.TimerTask;
 
 
 import Sounds.JumpSound;
+import Sounds.SoundLoader;
 import entities.Player;
 import levels.LevelManager;
 import main.Game;
 import objects.ObjectManager;
 import ui.GameOverOverlay;
 import ui.LevelCompletedOverlay;
+import ui.MuteButton;
 import ui.PauseOverlay;
 import utilz.LoadSave;
 
@@ -29,6 +31,7 @@ public class Playing extends State implements Statemethods {
 	private PauseOverlay pauseOverlay;
 	private GameOverOverlay gameOverOverlay;
 	private LevelCompletedOverlay levelCompletedOverlay;
+	private MuteButton muteButton = new MuteButton();
 	private boolean paused;
 
 	private int yLvlOffset;
@@ -118,6 +121,7 @@ public class Playing extends State implements Statemethods {
 		player.render(g, yLvlOffset);
 		
 		objectManager.draw(g, yLvlOffset);
+		muteButton.draw(g);
 
 		if (paused) {
 			g.setColor(new Color(0, 0, 0, 150));
@@ -168,6 +172,9 @@ public class Playing extends State implements Statemethods {
 			case KeyEvent.VK_W:
 				jumpingWithSound();
 				break;
+			case KeyEvent.VK_M:
+				SoundLoader.toggleMute();
+				break;
 			case KeyEvent.VK_ESCAPE:
 				if(paused==false) {
 				paused = true;
@@ -207,6 +214,8 @@ public class Playing extends State implements Statemethods {
 				}
 			else if (lvlCompleted)
 				levelCompletedOverlay.mousePressed(e);
+			else
+				muteButton.mousePressed(e);
 		}else {
 			gameOverOverlay.mousePressed(e);
 		}

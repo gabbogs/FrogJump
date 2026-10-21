@@ -11,29 +11,11 @@ import static ui.PixelUi.*;
 // change the volume; click the speaker to mute or unmute.
 public class VolumeSlider {
 
-	private static final String[] SPEAKER = {
-			"...#.....",
-			"..##..#..",
-			"####...#.",
-			"####.#.#.",
-			"####...#.",
-			"..##..#..",
-			"...#.....", };
-	private static final String[] SPEAKER_MUTED = {
-			"...#.....",
-			"..##.....",
-			"####.#.#.",
-			"####..#..",
-			"####.#.#.",
-			"..##.....",
-			"...#.....", };
-
 	private final Rectangle panel;
 	private final Rectangle speaker;
 	private final Rectangle track;
 	private final Rectangle hitArea;
 	private boolean dragging;
-	private float volumeBeforeMute = SoundLoader.getVolume();
 
 	// (centerX, y) is the top center of the slider panel
 	public VolumeSlider(int centerX, int y) {
@@ -46,7 +28,7 @@ public class VolumeSlider {
 	public void draw(Graphics g) {
 		drawFrame(g, panel);
 
-		drawPixels(g, SoundLoader.getVolume() > 0 ? SPEAKER : SPEAKER_MUTED, speaker.x, speaker.y, P, DARK);
+		drawPixels(g, SoundLoader.isMuted() ? SPEAKER_MUTED : SPEAKER, speaker.x, speaker.y, P, DARK);
 
 		// Track: dark outline, gold up to the current volume, dark brick after it
 		fill(g, DARK, track, -P);
@@ -73,7 +55,7 @@ public class VolumeSlider {
 			return true;
 		}
 		if (speaker.contains(e.getX(), e.getY())) {
-			toggleMute();
+			SoundLoader.toggleMute();
 			return true;
 		}
 		return false;
@@ -92,19 +74,6 @@ public class VolumeSlider {
 	}
 
 	private void setFromMouse(int x) {
-		float volume = (float) (x - track.x) / track.width;
-		SoundLoader.setVolume(volume);
-		if (SoundLoader.getVolume() > 0)
-			volumeBeforeMute = SoundLoader.getVolume();
+		SoundLoader.setVolume((float) (x - track.x) / track.width);
 	}
-
-	private void toggleMute() {
-		if (SoundLoader.getVolume() > 0) {
-			volumeBeforeMute = SoundLoader.getVolume();
-			SoundLoader.setVolume(0);
-		} else {
-			SoundLoader.setVolume(volumeBeforeMute > 0 ? volumeBeforeMute : 0.7f);
-		}
-	}
-
 }

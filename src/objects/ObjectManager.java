@@ -12,6 +12,7 @@ import entities.Player;
 import gamestates.Playing;
 import levels.Level;
 import main.Game;
+import ui.MuteButton;
 import ui.PixelUi;
 import utilz.LoadSave;
 import static utilz.Constants.ObjectConstants.*;
@@ -96,7 +97,8 @@ public class ObjectManager {
 		// 4x keeps the apple's pixels whole at the browser's half resolution
 		int iconW = appleIcon.getWidth() * 4, iconH = appleIcon.getHeight() * 4;
 		int frame = 4 * PixelUi.P, pad = 6;
-		Rectangle panel = new Rectangle(24, 24,
+		// Right of the mute button (see ui.MuteButton)
+		Rectangle panel = new Rectangle(MuteButton.X + MuteButton.SIZE + 16, MuteButton.Y,
 				frame + pad + iconW + 12 + PixelUi.textWidth(text, textSize) + pad + frame,
 				frame + pad + iconH + pad + frame);
 		PixelUi.drawFrame(g, panel);

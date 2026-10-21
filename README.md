@@ -13,7 +13,8 @@ A 2D platformer built in Java (Swing). Collect every apple, avoid the spikes, an
 | `Enter` or click **Play** | Start |
 | `A` / `D` | Move left / right |
 | `W` / `Space` | Jump |
-| `Esc` | Pause (the pause menu has a volume slider; click the speaker to mute) |
+| `Esc` | Pause (the pause menu has a volume slider) |
+| `M` or the speaker button | Mute / unmute |
 
 ## How it works
 

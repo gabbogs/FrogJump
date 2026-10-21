@@ -43,6 +43,24 @@ public class PixelUi {
 					g.fillRect(x + col * size, y + row * size, size, size);
 	}
 
+	// Speaker icons for the volume slider and mute button
+	public static final String[] SPEAKER = {
+			"...#.....",
+			"..##..#..",
+			"####...#.",
+			"####.#.#.",
+			"####...#.",
+			"..##..#..",
+			"...#.....", };
+	public static final String[] SPEAKER_MUTED = {
+			"...#.....",
+			"..##.....",
+			"####.#.#.",
+			"####..#..",
+			"####.#.#.",
+			"..##.....",
+			"...#.....", };
+
 	// 3x5 pixel font: digits 0-9 and 'x'
 	private static final String[][] GLYPHS = {
 			{ "###", "#.#", "#.#", "#.#", "###" }, { ".#.", "##.", ".#.", ".#.", "###" },

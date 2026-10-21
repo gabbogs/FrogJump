@@ -7,7 +7,9 @@ import java.awt.image.BufferedImage;
 
 import Sounds.BackgroundMusic;
 import main.Game;
+import Sounds.SoundLoader;
 import ui.MenuButton;
+import ui.MuteButton;
 import utilz.LoadSave;
 
 public class Menu extends State implements Statemethods {
@@ -16,6 +18,7 @@ public class Menu extends State implements Statemethods {
 	private BufferedImage backgroundImg, backgroundImgPink;
 	private int menuX, menuY, menuWidth, menuHeight;
 	public BackgroundMusic bgMusic;
+	private MuteButton muteButton = new MuteButton();
 
 
 	public Menu(Game game) {
@@ -55,6 +58,7 @@ public class Menu extends State implements Statemethods {
 
 		for (MenuButton mb : buttons)
 			mb.draw(g);
+		muteButton.draw(g);
 	}
 
 	@Override
@@ -65,6 +69,8 @@ public class Menu extends State implements Statemethods {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		if (muteButton.mousePressed(e))
+			return;
 		for (MenuButton mb : buttons) {
 			if (isIn(e, mb)) {
 				mb.setMousePressed(true);
@@ -109,6 +115,8 @@ public class Menu extends State implements Statemethods {
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER)
 			Gamestate.state = Gamestate.PLAYING;
+		else if (e.getKeyCode() == KeyEvent.VK_M)
+			SoundLoader.toggleMute();
 
 	}
 
