@@ -13,7 +13,7 @@ A 2D platformer built in Java (Swing). Collect every apple, avoid the spikes, an
 | `Enter` or click **Play** | Start |
 | `A` / `D` | Move left / right |
 | `W` / `Space` | Jump |
-| `Esc` | Pause |
+| `Esc` | Pause (the pause menu has a volume slider; click the speaker to mute) |
 
 ## How it works
 
@@ -31,7 +31,7 @@ A 2D platformer built in Java (Swing). Collect every apple, avoid the spikes, an
 
 FrogJump was a course project built by a team of five. I designed the game's UI screens (main menu, pause, game over, and level complete) and the Level 2 map, which I drew pixel by pixel in GIMP.
 
-For the web version I moved levels and sounds into the classpath so the game runs from a JAR, added the browser mode and its performance work, compressed the background music (mono, 24 kHz) and loaded it in the background so it never delays the game, and replaced a copyrighted sound effect with an original one.
+For the web version I moved levels and sounds into the classpath so the game runs from a JAR, redrew the apple counter in the game's pixel style, added a volume slider to the pause menu, added the browser mode and its performance work, compressed the background music (mono, 24 kHz) and loaded it in the background so it never delays the game, and replaced a copyrighted sound effect with an original one.
 
 Character, terrain, and fruit art: [Pixel Adventure](https://pixelfrog-assets.itch.io/pixel-adventure-1) by Pixel Frog.
 

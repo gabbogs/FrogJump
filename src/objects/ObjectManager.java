@@ -1,11 +1,10 @@
 package objects;
 
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-
-import javax.swing.JLabel;
 
 import Sounds.CoinCollectSound;
 import Sounds.DeathSound;
@@ -13,6 +12,7 @@ import entities.Player;
 import gamestates.Playing;
 import levels.Level;
 import main.Game;
+import ui.PixelUi;
 import utilz.LoadSave;
 import static utilz.Constants.ObjectConstants.*;
 
@@ -21,31 +21,23 @@ public class ObjectManager {
 	private Playing playing;
 	private BufferedImage[][] appleImgs;
 	private BufferedImage spikeImg;
+	private BufferedImage appleIcon;
 
 	private ArrayList<Apple> apples;
 	private ArrayList<Spike> spikes;
 
 	private CoinCollectSound coinSound;
-	public JLabel coinCounterLabel;
-	public int coinCounter = 100;
-	
+	private int applesLeft;
 
 	public ObjectManager(Playing playing) {
 		this.playing = playing;
 		coinSound = new CoinCollectSound();
-		coinCounterLabel = new JLabel();
-		
 		loadImgs();
 	}
 	public void checkSpikesTouched(Player p) {
 		for(Spike s: spikes)
 			if(s.getHitbox().intersects(p.getHitbox()))
 				p.kill();
-	
-			if(playing.isGameOver()) {
-			coinCounter = 100;
-		}
-				
 	}
 	public void checkObjectTouched(Rectangle2D.Float hitbox) {
 		boolean isAnyActive = false;
@@ -55,8 +47,7 @@ public class ObjectManager {
 				if (hitbox.intersects(a.getHitbox())) {
 					coinSound.startSound();	
 					a.setActive(false);
-					coinCounter--;
-					coinCounterLabel.setText("APPLES LEFT: "+coinCounter);
+					applesLeft--;
 				}
 			}
 		if(!isAnyActive) {
@@ -69,6 +60,7 @@ public class ObjectManager {
 	public void loadObjects(Level newLevel) {
 		apples = new ArrayList<>(newLevel.getApples());
 		spikes = newLevel.getSpikes();
+		applesLeft = apples.size();
 	}
 
 	private void loadImgs() {
@@ -81,6 +73,8 @@ public class ObjectManager {
 
 		spikeImg = LoadSave.GetSpriteAtlas(LoadSave.TRAP_ATLAS);
 
+		// The apple itself, without the empty space around it in the animation frame
+		appleIcon = appleImgs[0][0].getSubimage(12, 13, 12, 14);
 	}
 
 	public void update() {
@@ -92,7 +86,24 @@ public class ObjectManager {
 	public void draw(Graphics g, int yLvlOffset) {
 		drawApples(g, yLvlOffset);
 		drawTraps(g, yLvlOffset);
+		drawAppleCounter(g);
+	}
 
+	// Top-left panel showing how many apples are left, styled like the pause menu
+	private void drawAppleCounter(Graphics g) {
+		int textSize = 6;
+		String text = "x" + applesLeft;
+		// 4x keeps the apple's pixels whole at the browser's half resolution
+		int iconW = appleIcon.getWidth() * 4, iconH = appleIcon.getHeight() * 4;
+		int frame = 4 * PixelUi.P, pad = 6;
+		Rectangle panel = new Rectangle(24, 24,
+				frame + pad + iconW + 12 + PixelUi.textWidth(text, textSize) + pad + frame,
+				frame + pad + iconH + pad + frame);
+		PixelUi.drawFrame(g, panel);
+
+		int contentX = panel.x + frame + pad, contentY = panel.y + frame + pad;
+		g.drawImage(appleIcon, contentX, contentY, iconW, iconH, null);
+		PixelUi.drawText(g, text, contentX + iconW + 12, contentY + (iconH - 5 * textSize) / 2, textSize);
 	}
 
 
@@ -133,8 +144,7 @@ public class ObjectManager {
 		//loadObjects(playing.getLevelManager().getCurrentLevel());
 		for (Apple a: apples)
 			a.reset();
-		coinCounter = 100;
-		coinCounterLabel.setText("APPLES LEFT: "+coinCounter);
+		applesLeft = apples.size();
 	}
 
 }

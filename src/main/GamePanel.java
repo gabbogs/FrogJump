@@ -45,7 +45,6 @@ public class GamePanel extends JPanel {
 		setPanelSize(web);
 
 		addKeyListener(new KeyboardInputs(this));
-		add(game.getPlaying().getObjectManager().coinCounterLabel);
 		ScaledMouse scaledMouse = new ScaledMouse();
 		addMouseListener(scaledMouse);
 		addMouseMotionListener(scaledMouse);

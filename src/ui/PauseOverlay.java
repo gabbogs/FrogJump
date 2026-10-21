@@ -19,12 +19,15 @@ public class PauseOverlay {
 	private int bgX, bgY, bgW, bgH;
 	
 	private UrmButton menuB, replayB, unpauseB;
+	private VolumeSlider volumeSlider;
 
 
 	public PauseOverlay(Playing playing) {
 		this.playing = playing;
 		loadBackground();
 		createUrmButtons();
+		// The pause menu image leaves room under its frame (which ends 222px down the image) for this
+		volumeSlider = new VolumeSlider(Game.GAME_WIDTH / 2, bgY + (int) (228 * Game.SCALE));
 		
 	}
 	private void createUrmButtons() {
@@ -60,14 +63,16 @@ public class PauseOverlay {
 		menuB.draw(g);
 		replayB.draw(g);
 		unpauseB.draw(g);
+		volumeSlider.draw(g);
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		
+		volumeSlider.mouseDragged(e);
 	}
 
 	public void mousePressed(MouseEvent e) {
-		
+		if (volumeSlider.mousePressed(e))
+			return;
 		if (isIn(e, menuB)) {
 			menuB.setMousePressed(true);
 		}
@@ -82,7 +87,8 @@ public class PauseOverlay {
 	}
 
 	public void mouseReleased(MouseEvent e) {
-		
+		if (volumeSlider.mouseReleased(e))
+			return;
 		if (isIn(e, menuB)) {
 			if (menuB.isMousePressed()) {
 				Gamestate.state = Gamestate.MENU;
