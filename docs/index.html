@@ -44,7 +44,7 @@
     <div id="loading" class="overlay">Loading the Java runtime…<br />(the first visit can take up to a minute)</div>
     <div id="hint" class="overlay" hidden>
       <div>
-        <strong>Click to play fullscreen</strong><br />
+        <strong>Click the game to play</strong><br />
         <kbd>Enter</kbd> start · <kbd>A</kbd> <kbd>D</kbd> move · <kbd>W</kbd> / <kbd>Space</kbd> jump · <kbd>Esc</kbd> pause
       </div>
     </div>
@@ -60,15 +60,13 @@
     const hint = document.getElementById("hint");
     const fsButton = document.getElementById("fullscreen");
 
-    // Browsers only allow fullscreen right after a click or key press, so the first click on the game
-    // (which also gives it keyboard focus) switches to fullscreen. Without fullscreen support it stays full-window.
+    // The game fills the window; true fullscreen is optional, from the corner button
     function goFullscreen() {
       if (!document.fullscreenElement && stage.requestFullscreen) stage.requestFullscreen().catch(() => {});
     }
+    // The first click on the game gives it keyboard focus; the hint isn't needed after that
     stage.addEventListener("pointerdown", (e) => {
-      if (e.target.closest(".corner")) return;
-      goFullscreen();
-      hint.style.opacity = 0;
+      if (!e.target.closest(".corner")) hint.style.opacity = 0;
     }, { capture: true });
     fsButton.addEventListener("click", goFullscreen);
     if (document.fullscreenEnabled) fsButton.hidden = false;

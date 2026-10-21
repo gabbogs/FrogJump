@@ -23,7 +23,7 @@ A 2D platformer built in Java (Swing). Collect every apple, avoid the spikes, an
 
 ## Run it
 
-**In the browser:** the game in `docs/` runs through [CheerpJ](https://cheerpj.com/), which runs the original Java program in the browser with WebAssembly. The page fills the browser window and switches to fullscreen on the first click. Passing `--web` gives a borderless window that scales the game to fit the page and follows it when the size changes. To keep it smooth in the browser, `--web` mode draws each frame at half resolution and scales it up (the pixel art is drawn at 2× or more, so nothing is lost), pre-renders each level's terrain once, and skips drawing anything off-screen. Add `--perf` to print updates and frames per second.
+**In the browser:** the game in `docs/` runs through [CheerpJ](https://cheerpj.com/), which runs the original Java program in the browser with WebAssembly. The page fills the browser window, with an optional fullscreen button. Passing `--web` gives a borderless window that scales the game to fit the page and follows it when the size changes. To keep it smooth in the browser, `--web` mode draws each frame at half resolution and scales it up (the pixel art is drawn at 2× or more, so nothing is lost), pre-renders each level's terrain once, and skips drawing anything off-screen. Add `--perf` to print updates and frames per second.
 
 **On the desktop:** open the project in Eclipse (or any Java IDE) with `src` and `res` as source folders, then run `main.MainClass`. Java 8 or newer.
 
