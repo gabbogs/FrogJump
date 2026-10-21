@@ -24,11 +24,9 @@ public class GamePanel extends JPanel {
 	private MouseInputs mouseInputs;
 	private Game game;
 
-	// Web mode fills the browser area: the game is drawn scaled by `scale` and centered at (offsetX, offsetY).
-	// On the desktop these stay at 1 and 0, so nothing changes.
-	private double scale = 1;
-	private int offsetX = 0, offsetY = 0;
-	private int fittedWidth, fittedHeight;
+	// Web mode stretches the game to fill the browser area: it's drawn scaled by (scaleX, scaleY).
+	// On the desktop these stay at 1, so nothing changes.
+	private double scaleX = 1, scaleY = 1;
 
 	// Web mode: the frame is drawn at this fraction of the game's resolution, then scaled up (see paintViaBackBuffer)
 	private static final double BUFFER_SCALE = 0.5;
@@ -64,17 +62,11 @@ public class GamePanel extends JPanel {
 		backBuffer = new BufferedImage((int) (GAME_WIDTH * BUFFER_SCALE), (int) (GAME_HEIGHT * BUFFER_SCALE), BufferedImage.TYPE_INT_RGB);
 	}
 
-	// Fits the game inside the panel, keeping its aspect ratio. Rechecked every frame because the
+	// Stretches the game to fill the panel with no black bars. Rechecked every frame because the
 	// page can change size (going fullscreen, resizing the browser window).
 	private void fitToPanel() {
-		int w = getWidth(), h = getHeight();
-		if (w == fittedWidth && h == fittedHeight)
-			return;
-		scale = Math.min((double) w / GAME_WIDTH, (double) h / GAME_HEIGHT);
-		offsetX = (int) ((w - GAME_WIDTH * scale) / 2);
-		offsetY = (int) ((h - GAME_HEIGHT * scale) / 2);
-		fittedWidth = w;
-		fittedHeight = h;
+		scaleX = (double) getWidth() / GAME_WIDTH;
+		scaleY = (double) getHeight() / GAME_HEIGHT;
 	}
 
 	public void paintComponent(Graphics g) {
@@ -99,7 +91,7 @@ public class GamePanel extends JPanel {
 
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-		g2.drawImage(backBuffer, offsetX, offsetY, (int) (GAME_WIDTH * scale), (int) (GAME_HEIGHT * scale), null);
+		g2.drawImage(backBuffer, 0, 0, getWidth(), getHeight(), null);
 	}
 
 	public Game getGame() {
@@ -110,8 +102,8 @@ public class GamePanel extends JPanel {
 	private class ScaledMouse implements MouseListener, MouseMotionListener {
 
 		private MouseEvent toGame(MouseEvent e) {
-			int x = (int) ((e.getX() - offsetX) / scale);
-			int y = (int) ((e.getY() - offsetY) / scale);
+			int x = (int) (e.getX() / scaleX);
+			int y = (int) (e.getY() / scaleY);
 			return new MouseEvent(e.getComponent(), e.getID(), e.getWhen(), e.getModifiersEx(), x, y,
 					e.getClickCount(), e.isPopupTrigger(), e.getButton());
 		}
