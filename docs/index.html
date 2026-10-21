@@ -10,63 +10,75 @@
   <meta property="og:image" content="preview.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400&display=swap" rel="stylesheet" />
   <style>
-    :root { --bg: #0c0c0f; --ink: #f4f4f5; --muted: #a0a0a8; --line: #2a2a30; }
+    :root { --ink: #f4f4f5; --muted: #a0a0a8; --line: #2a2a30; }
     * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Geist", system-ui, sans-serif; }
-    header {
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-      padding: 14px 20px; border-bottom: 1px solid var(--line);
-    }
-    header a { color: var(--muted); text-decoration: none; font-family: "Geist Mono", monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
-    header a:hover { color: var(--ink); }
-    h1 { margin: 0; font-size: 16px; font-weight: 600; }
-    .controls { font-family: "Geist Mono", monospace; font-size: 12px; color: var(--muted); text-align: center; padding: 12px 16px; line-height: 2; }
-    kbd { border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; color: var(--ink); }
-    /* The game renders at 1664x896; the stage keeps that aspect ratio and the game scales itself to fit */
-    #stage {
-      position: relative; width: min(calc(100vw - 32px), calc((100vh - 150px) * 1664 / 896)); aspect-ratio: 1664 / 896;
-      margin: 0 auto; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #000;
-    }
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #000; color: var(--ink); font-family: "Geist Mono", monospace; }
+    /* The game fills the whole window; it scales itself to fit and follows size changes (see GamePanel) */
+    #stage { position: fixed; inset: 0; }
     #display { position: absolute; inset: 0; }
-    #loading {
+    .overlay {
       position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
-      font-family: "Geist Mono", monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted);
-      pointer-events: none;
+      font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); line-height: 2.2;
+      pointer-events: none; /* clicks go through to the game */
     }
-    .note { max-width: 640px; margin: 16px auto 32px; padding: 0 16px; color: var(--muted); font-size: 13px; line-height: 1.6; text-align: center; }
-    .note a { color: inherit; }
+    .overlay[hidden] { display: none; }
+    #hint { place-items: start center; padding-top: 12px; transition: opacity .4s; }
+    #hint div { background: rgba(0, 0, 0, .7); border: 1px solid var(--line); border-radius: 8px; padding: 10px 18px; }
+    #hint strong { color: var(--ink); font-weight: 400; }
+    kbd { border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; color: var(--ink); }
+    .corner { position: fixed; top: 10px; right: 12px; display: flex; gap: 8px; }
+    .corner a, .corner button {
+      font: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; cursor: pointer;
+      color: var(--muted); background: rgba(0, 0, 0, .6); border: 1px solid var(--line); border-radius: 6px; padding: 5px 10px;
+    }
+    .corner a:hover, .corner button:hover { color: var(--ink); }
+    .corner [hidden] { display: none; }
+    :fullscreen .corner { display: none; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>FrogJump</h1>
-    <a href="https://github.com/gabbogs/FrogJump">source ↗</a>
-  </header>
-
-  <p class="controls">
-    Click the game first · <kbd>Enter</kbd> start · <kbd>A</kbd> <kbd>D</kbd> move · <kbd>W</kbd> / <kbd>Space</kbd> jump · <kbd>Esc</kbd> pause
-  </p>
-
   <div id="stage">
     <div id="display"></div>
-    <div id="loading">Loading the Java runtime…<br />(the first visit can take up to a minute)</div>
+    <div id="loading" class="overlay">Loading the Java runtime…<br />(the first visit can take up to a minute)</div>
+    <div id="hint" class="overlay" hidden>
+      <div>
+        <strong>Click to play fullscreen</strong><br />
+        <kbd>Enter</kbd> start · <kbd>A</kbd> <kbd>D</kbd> move · <kbd>W</kbd> / <kbd>Space</kbd> jump · <kbd>Esc</kbd> pause
+      </div>
+    </div>
+    <div class="corner">
+      <button id="fullscreen" type="button" hidden>Fullscreen</button>
+      <a href="https://github.com/gabbogs/FrogJump">source ↗</a>
+    </div>
   </div>
-
-  <p class="note">
-    FrogJump is a 2D platformer our team of five built in Java (Swing) for a course. Collect every apple and avoid the spikes.
-    It runs here as the original desktop Java program, in the browser through
-    <a href="https://cheerpj.com/">CheerpJ</a>. Best played on a computer with a keyboard.
-  </p>
 
   <script src="https://cjrtnc.leaningtech.com/4.2/loader.js"></script>
   <script>
+    const stage = document.getElementById("stage");
+    const hint = document.getElementById("hint");
+    const fsButton = document.getElementById("fullscreen");
+
+    // Browsers only allow fullscreen right after a click or key press, so the first click on the game
+    // (which also gives it keyboard focus) switches to fullscreen. Without fullscreen support it stays full-window.
+    function goFullscreen() {
+      if (!document.fullscreenElement && stage.requestFullscreen) stage.requestFullscreen().catch(() => {});
+    }
+    stage.addEventListener("pointerdown", (e) => {
+      if (e.target.closest(".corner")) return;
+      goFullscreen();
+      hint.style.opacity = 0;
+    }, { capture: true });
+    fsButton.addEventListener("click", goFullscreen);
+    if (document.fullscreenEnabled) fsButton.hidden = false;
+
     (async () => {
       await cheerpjInit({ status: "none" });
       // Size the Java "screen" to the stage; the game scales itself to fit (see GamePanel)
       cheerpjCreateDisplay(-1, -1, document.getElementById("display"));
       document.getElementById("loading").remove();
+      hint.hidden = false;
       // CheerpJ maps /app/ to the site's root, so build the JAR path from this page's location
       const dir = location.pathname.replace(/[^/]*$/, "");
       await cheerpjRunJar("/app" + dir + "frogjump.jar", "--web");

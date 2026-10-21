@@ -28,6 +28,7 @@ public class GamePanel extends JPanel {
 	// On the desktop these stay at 1 and 0, so nothing changes.
 	private double scale = 1;
 	private int offsetX = 0, offsetY = 0;
+	private int fittedWidth, fittedHeight;
 
 	// Web mode: the frame is drawn at this fraction of the game's resolution, then scaled up (see paintViaBackBuffer)
 	private static final double BUFFER_SCALE = 0.5;
@@ -57,14 +58,23 @@ public class GamePanel extends JPanel {
 			setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
 			return;
 		}
-		// In the browser the "screen" is the page's game area; fit the game inside it
-		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-		scale = Math.min((double) screen.width / GAME_WIDTH, (double) screen.height / GAME_HEIGHT);
-		offsetX = (int) ((screen.width - GAME_WIDTH * scale) / 2);
-		offsetY = (int) ((screen.height - GAME_HEIGHT * scale) / 2);
-		setPreferredSize(screen);
+		// In the browser the "screen" is the page's game area; the panel fills it (see GameWindow)
+		setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize());
 		setBackground(Color.BLACK);
 		backBuffer = new BufferedImage((int) (GAME_WIDTH * BUFFER_SCALE), (int) (GAME_HEIGHT * BUFFER_SCALE), BufferedImage.TYPE_INT_RGB);
+	}
+
+	// Fits the game inside the panel, keeping its aspect ratio. Rechecked every frame because the
+	// page can change size (going fullscreen, resizing the browser window).
+	private void fitToPanel() {
+		int w = getWidth(), h = getHeight();
+		if (w == fittedWidth && h == fittedHeight)
+			return;
+		scale = Math.min((double) w / GAME_WIDTH, (double) h / GAME_HEIGHT);
+		offsetX = (int) ((w - GAME_WIDTH * scale) / 2);
+		offsetY = (int) ((h - GAME_HEIGHT * scale) / 2);
+		fittedWidth = w;
+		fittedHeight = h;
 	}
 
 	public void paintComponent(Graphics g) {
@@ -80,6 +90,7 @@ public class GamePanel extends JPanel {
 	// into a half-resolution image (a quarter of the pixels) and copied to the screen in one scaled draw.
 	// Every sprite is pixel art at a multiple of 2, so nothing is lost at half size.
 	private void paintViaBackBuffer(Graphics g) {
+		fitToPanel();
 		Graphics2D bg = backBuffer.createGraphics();
 		bg.scale(BUFFER_SCALE, BUFFER_SCALE);
 		bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
