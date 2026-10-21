@@ -96,9 +96,16 @@ public class ObjectManager {
 	}
 
 
+	// True when something drawn at game-y `y` (one tile tall) would be visible on screen
+	private boolean onScreen(float y, int yLvlOffset) {
+		return y + Game.TILES_SIZE >= yLvlOffset && y - Game.TILES_SIZE <= yLvlOffset + Game.GAME_HEIGHT;
+	}
+
 	private void drawTraps(Graphics g, int yLvlOffset) {
 		for(Spike s: spikes) {
-			g.drawImage(spikeImg, 
+			if (!onScreen(s.getHitbox().y, yLvlOffset))
+				continue;
+			g.drawImage(spikeImg,
 					(int)(s.getHitbox().x - s.getxDrawOffset()),
 					(int)(s.getHitbox().y - s.getyDrawOffset() - yLvlOffset), 
 					SPIKE_WIDTH, SPIKE_HEIGHT, 
@@ -110,7 +117,7 @@ public class ObjectManager {
 
 	private void drawApples(Graphics g, int yLvlOffset) {
 		for (Apple a : apples) {
-			if (a.isActive()) {
+			if (a.isActive() && onScreen(a.getHitbox().y, yLvlOffset)) {
 				int type = 0;
 				g.drawImage(appleImgs[type][a.getAniIndex()], 
 						(int) (a.getHitbox().x - a.getxDrawOffset() ),

@@ -11,8 +11,11 @@ public class Game implements Runnable {
 	private GameWindow gameWindow;
 	private GamePanel gamePanel;
 	private Thread gameThread;
-	private final int FPS_SET = 120;
+	private final int FPS_SET;
 	private final int UPS_SET = 200;
+	// Most updates to run in one loop pass when catching up after a slow frame
+	private static final int MAX_CATCH_UP = 10;
+	private final boolean showPerf;
 
 	private Playing playing;
 	private Menu menu;
@@ -25,7 +28,10 @@ public class Game implements Runnable {
 	public final static int GAME_WIDTH = TILES_SIZE * TILES_IN_WIDTH;
 	public final static int GAME_HEIGHT = TILES_SIZE * TILES_IN_HEIGHT;
 
-	public Game(boolean web) {
+	public Game(boolean web, boolean showPerf) {
+		// Browsers refresh at 60 Hz, so drawing more often there only costs time
+		FPS_SET = web ? 60 : 120;
+		this.showPerf = showPerf;
 		initClasses();
 		gamePanel = new GamePanel(this, web);
 		gameWindow = new GameWindow(gamePanel, web);
@@ -84,6 +90,9 @@ public class Game implements Runnable {
 		double deltaU = 0;
 		double deltaF = 0;
 
+		int updates = 0;
+		long lastCheck = System.currentTimeMillis();
+
 		while (true) {
 			long currentTime = System.nanoTime();
 
@@ -91,26 +100,36 @@ public class Game implements Runnable {
 			deltaF += (currentTime - previousTime) / timePerFrame;
 			previousTime = currentTime;
 
-			boolean idle = true;
-			if (deltaU >= 1) {
+			// Run every update that's due in one batch. The loop only wakes once per frame, so several
+			// fixed-size updates run back to back; game speed stays exactly UPS_SET either way.
+			int ran = 0;
+			while (deltaU >= 1 && ran < MAX_CATCH_UP) {
 				update();
 				deltaU--;
-				idle = false;
+				ran++;
 			}
+			if (deltaU >= 1)
+				deltaU = 0; // too far behind: skip ahead instead of fast-forwarding
+			updates += ran;
 
 			if (deltaF >= 1) {
 				gamePanel.repaint();
-				deltaF--;
-				idle = false;
+				deltaF = 0; // never queue extra frames
 			}
 
-			// Yield between ticks instead of spinning at 100% CPU (also keeps the browser version responsive)
-			if (idle) {
-				try {
-					Thread.sleep(1);
-				} catch (InterruptedException e) {
-					return;
-				}
+			if (showPerf && System.currentTimeMillis() - lastCheck >= 2000) {
+				System.out.println("perf: " + updates / 2 + " updates/s, " + gamePanel.takeFrameCount() / 2 + " frames/s");
+				updates = 0;
+				lastCheck = System.currentTimeMillis();
+			}
+
+			// Sleep until the next frame is due instead of spinning. Waking up rarely matters most in the
+			// browser, where every wake-up competes with drawing for the page's single main thread.
+			long sleepMs = (long) ((1 - deltaF) * timePerFrame / 1000000);
+			try {
+				Thread.sleep(Math.max(1, sleepMs));
+			} catch (InterruptedException e) {
+				return;
 			}
 		}
 

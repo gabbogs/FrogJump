@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
+import Sounds.BackgroundMusic;
 import main.Game;
 import ui.MenuButton;
 import utilz.LoadSave;
@@ -14,13 +15,16 @@ public class Menu extends State implements Statemethods {
 	private MenuButton[] buttons = new MenuButton[2];
 	private BufferedImage backgroundImg, backgroundImgPink;
 	private int menuX, menuY, menuWidth, menuHeight;
+	public BackgroundMusic bgMusic;
 
 
 	public Menu(Game game) {
 		super(game);
 		loadButtons();
 		loadBackground();
-		backgroundImgPink = LoadSave.GetSpriteAtlas(LoadSave.FOREST_BG);
+		backgroundImgPink = LoadSave.GetScaledImage(LoadSave.FOREST_BG, Game.GAME_WIDTH, Game.GAME_HEIGHT);
+		bgMusic = new BackgroundMusic();
+		bgMusic.startMusic();
 	}
 
 

@@ -47,7 +47,7 @@ public class Playing extends State implements Statemethods {
 	public Playing(Game game) {
 		super(game);
 		initClasses();
-		backgroundImg = LoadSave.GetSpriteAtlas(LoadSave.FOREST_BG);
+		backgroundImg = LoadSave.GetScaledImage(LoadSave.FOREST_BG, Game.GAME_WIDTH, Game.GAME_HEIGHT);
 		calcLvlOffset();
 		loadStartLevel();
 	
@@ -90,9 +90,11 @@ public class Playing extends State implements Statemethods {
 			levelManager.update();
 			objectManager.update();
 			player.update();
+			game.getMenu().bgMusic.startMusic();
 			checkCloseToBorder();
 		} else if(gameOver) {
 			gameOverOverlay.update();
+			game.getMenu().bgMusic.resetMusic();
 		}
 	}
 	private void checkCloseToBorder() {

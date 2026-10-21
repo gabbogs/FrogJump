@@ -9,6 +9,8 @@ import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.JPanel;
 import inputs.KeyboardInputs;
 import inputs.MouseInputs;
@@ -26,6 +28,17 @@ public class GamePanel extends JPanel {
 	// On the desktop these stay at 1 and 0, so nothing changes.
 	private double scale = 1;
 	private int offsetX = 0, offsetY = 0;
+
+	// Web mode: the frame is drawn at this fraction of the game's resolution, then scaled up (see paintViaBackBuffer)
+	private static final double BUFFER_SCALE = 0.5;
+	private BufferedImage backBuffer;
+
+	// Frames actually painted since the last takeFrameCount() call (for the --perf readout)
+	private final AtomicInteger frames = new AtomicInteger();
+
+	public int takeFrameCount() {
+		return frames.getAndSet(0);
+	}
 
 	public GamePanel(Game game, boolean web) {
 		mouseInputs = new MouseInputs(this);
@@ -51,18 +64,31 @@ public class GamePanel extends JPanel {
 		offsetY = (int) ((screen.height - GAME_HEIGHT * scale) / 2);
 		setPreferredSize(screen);
 		setBackground(Color.BLACK);
+		backBuffer = new BufferedImage((int) (GAME_WIDTH * BUFFER_SCALE), (int) (GAME_HEIGHT * BUFFER_SCALE), BufferedImage.TYPE_INT_RGB);
 	}
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		Graphics2D g2 = (Graphics2D) g.create();
-		g2.translate(offsetX, offsetY);
-		g2.scale(scale, scale);
-		g2.clipRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-		// Keep pixel art crisp when scaled
+		if (backBuffer != null)
+			paintViaBackBuffer(g);
+		else
+			game.render(g);
+		frames.incrementAndGet();
+	}
+
+	// Browser drawing cost grows with the number of pixels touched, so in web mode the game is drawn
+	// into a half-resolution image (a quarter of the pixels) and copied to the screen in one scaled draw.
+	// Every sprite is pixel art at a multiple of 2, so nothing is lost at half size.
+	private void paintViaBackBuffer(Graphics g) {
+		Graphics2D bg = backBuffer.createGraphics();
+		bg.scale(BUFFER_SCALE, BUFFER_SCALE);
+		bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+		game.render(bg);
+		bg.dispose();
+
+		Graphics2D g2 = (Graphics2D) g;
 		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-		game.render(g2);
-		g2.dispose();
+		g2.drawImage(backBuffer, offsetX, offsetY, (int) (GAME_WIDTH * scale), (int) (GAME_HEIGHT * scale), null);
 	}
 
 	public Game getGame() {

@@ -1,6 +1,7 @@
 package utilz;
 
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +47,17 @@ public class LoadSave {
 			}
 		}
 		return img;
+	}
+
+	// Loads an image and stretches it to a fixed size once, so drawing it every frame is a plain copy
+	// instead of a resample (used for the full-screen forest background)
+	public static BufferedImage GetScaledImage(String fileName, int width, int height) {
+		BufferedImage src = GetSpriteAtlas(fileName);
+		BufferedImage out = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = out.createGraphics();
+		g.drawImage(src, 0, 0, width, height, null);
+		g.dispose();
+		return out;
 	}
 
 	// Loads /lvls/1.png, /lvls/2.png, ... from the classpath until one is missing.
