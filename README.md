@@ -37,6 +37,17 @@ FrogJump started as a course project.
 | **Matt Mariano** ([@mttrnmrn](https://github.com/mttrnmrn)) | Developer | The game: code, gameplay, physics, and level system |
 | **Gabriel C. Bognot** ([@gabbogs](https://github.com/gabbogs)) | Designer | UI screens, Level 2 map, and the browser version |
 
+**Matt**
+
+- **Game loop:** a fixed 200 updates per second, separate from drawing
+- **Player:** movement, jumping, gravity, and collision with the terrain
+- **Level system:** builds each level from an image (terrain, apples, spikes, spawn point), with a camera that scrolls up the level
+- **Objects:** floating, animated apples to collect and spikes that end the run
+- **Game states:** menu, playing, pause, game over, and level complete, with keyboard and mouse controls
+- **Sound:** background music and sound effects
+
+**Gab**
+
 - **UI screens:** main menu, pause, game over, and level complete
 - **Level 2 map:** drawn pixel by pixel in GIMP
 - **Browser version:** JavaScript port, apple counter, mute button, volume slider, compressed music, and an original sound effect replacing a copyrighted one
