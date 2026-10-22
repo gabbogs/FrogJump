@@ -122,48 +122,23 @@ async function loadImage(path) {
   return createImageBitmap(blob, { premultiplyAlpha: "none", colorSpaceConversion: "none" });
 }
 
+// The levels are images in res/lvls (red = terrain tile, blue = apples and spikes, green = spawn).
+// Browsers may color-correct images they read, which changes those numbers, so the levels are read
+// once with Java's image reader (the same values the Java game uses) and saved as levels.json.
 async function loadLevels() {
-  const levels = [];
-  for (let i = 1; ; i++) {
-    const res = await fetch(`assets/lvls/${i}.png`);
-    if (!res.ok) break;
-    const bitmap = await createImageBitmap(await res.blob(), { premultiplyAlpha: "none", colorSpaceConversion: "none" });
-    levels.push(new Level(bitmap));
-  }
-  return levels;
+  const data = await (await fetch("assets/lvls/levels.json")).json();
+  return data.map((level) => new Level(level));
 }
 
-// ---------- Level (levels.Level, utilz.HelpMethods) ----------
-// Each level is a small image: red = terrain tile, blue = apples (1) and spikes (2),
-// green = 100 marks the player's spawn.
+// ---------- Level (levels.Level) ----------
 
 class Level {
-  constructor(bitmap) {
-    const w = bitmap.width, h = bitmap.height;
-    const c = document.createElement("canvas");
-    c.width = w; c.height = h;
-    const cx = c.getContext("2d");
-    cx.drawImage(bitmap, 0, 0);
-    const px = cx.getImageData(0, 0, w, h).data;
-
-    this.data = [];
-    this.apples = [];
-    this.spikes = [];
-    this.spawn = null;
-    for (let j = 0; j < h; j++) {
-      const row = [];
-      for (let i = 0; i < w; i++) {
-        const k = (j * w + i) * 4;
-        const r = px[k], g = px[k + 1], b = px[k + 2];
-        row.push(r >= 242 ? 0 : r);
-        if (g === 100 && !this.spawn) this.spawn = { x: i * TILES_SIZE, y: j * TILES_SIZE };
-        if (b === APPLE) this.apples.push(new Apple(i * TILES_SIZE, j * TILES_SIZE));
-        if (b === SPIKE) this.spikes.push(new Spike(i * TILES_SIZE, j * TILES_SIZE));
-      }
-      this.data.push(row);
-    }
-    if (!this.spawn) this.spawn = { x: TILES_SIZE, y: TILES_SIZE };
-    this.maxLvlOffsetY = TILES_SIZE * (h - TILES_IN_HEIGHT);
+  constructor({ tiles, apples, spikes, spawn }) {
+    this.data = tiles;
+    this.apples = apples.map(([i, j]) => new Apple(i * TILES_SIZE, j * TILES_SIZE));
+    this.spikes = spikes.map(([i, j]) => new Spike(i * TILES_SIZE, j * TILES_SIZE));
+    this.spawn = { x: spawn[0] * TILES_SIZE, y: spawn[1] * TILES_SIZE };
+    this.maxLvlOffsetY = TILES_SIZE * (tiles.length - TILES_IN_HEIGHT);
     this.image = null;
   }
 
