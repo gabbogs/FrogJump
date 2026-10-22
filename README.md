@@ -32,10 +32,13 @@ A 2D platformer built in Java (Swing). Collect every apple, avoid the spikes, an
 
 FrogJump started as a course project.
 
-- **Matt Mariano** ([@mttrnmrn](https://github.com/mttrnmrn)), main developer: built the game itself, including the code, gameplay, physics, levels system, and everything not listed below.
-- **Gabriel C. Bognot** ([@gabbogs](https://github.com/gabbogs)), co-developer:
-  - **UI design:** the main menu, pause, game over, and level complete screens
-  - **Level 2 map:** drawn pixel by pixel in GIMP
-  - **Web deployment:** ported the game to JavaScript so it plays in the browser, redrew the apple counter in the game's pixel style, added a mute button and a volume slider, compressed the background music, and replaced a copyrighted sound effect with an original one
+| Who | Role | Made |
+| --- | --- | --- |
+| **Matt Mariano** ([@mttrnmrn](https://github.com/mttrnmrn)) | Main developer | The game: code, gameplay, physics, and level system |
+| **Gabriel C. Bognot** ([@gabbogs](https://github.com/gabbogs)) | Co-developer | UI screens, Level 2 map, and the browser version |
 
-Character, terrain, and fruit art: [Pixel Adventure](https://pixelfrog-assets.itch.io/pixel-adventure-1) by Pixel Frog.
+- **UI screens:** main menu, pause, game over, and level complete
+- **Level 2 map:** drawn pixel by pixel in GIMP
+- **Browser version:** JavaScript port, apple counter, mute button, volume slider, compressed music, and an original sound effect replacing a copyrighted one
+
+Art: [Pixel Adventure](https://pixelfrog-assets.itch.io/pixel-adventure-1) by Pixel Frog.
