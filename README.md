@@ -26,7 +26,7 @@ A 2D platformer built in Java (Swing). Collect every apple, avoid the spikes, an
 
 **On the desktop:** open the project in Eclipse (or any Java IDE) with `src` and `res` as source folders, then run `main.MainClass`. Java 8 or newer. Add `--perf` to print updates and frames per second.
 
-**In the browser:** `docs/` holds a JavaScript port of the game (`docs/game.js`) that GitHub Pages serves. It uses the same art, levels, physics numbers and rules as the Java code, drawn on an HTML canvas that fills the window. Physics runs at the same fixed 200 steps per second, and drawing blends between steps so movement stays smooth at any screen refresh rate. It loads in about a second (around 2 MB, most of it music), and the volume is remembered between visits.
+**In the browser:** `docs/` holds a JavaScript port of the game (`docs/game.js`) that GitHub Pages serves. It uses the same art, levels, physics numbers and rules as the Java code, drawn on an HTML canvas that fills the window. Physics runs at the same fixed 200 steps per second, and drawing blends between steps so movement stays smooth at any screen refresh rate. It loads in about a second (around 2 MB, most of it music), and the volume is remembered between visits. The web version reads levels from `docs/assets/lvls/levels.json`, exported from the level PNGs with Java's image reader (browsers may color-correct images, which would change the tile numbers). After editing a level, run `java tools/ExportLevels.java res/lvls docs/assets/lvls/levels.json`.
 
 ## Team and credits
 
