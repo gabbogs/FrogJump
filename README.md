@@ -34,8 +34,8 @@ FrogJump started as a course project.
 
 | Who | Role | Made |
 | --- | --- | --- |
-| **Matt Mariano** ([@mttrnmrn](https://github.com/mttrnmrn)) | Main developer | The game: code, gameplay, physics, and level system |
-| **Gabriel C. Bognot** ([@gabbogs](https://github.com/gabbogs)) | Co-developer | UI screens, Level 2 map, and the browser version |
+| **Matt Mariano** ([@mttrnmrn](https://github.com/mttrnmrn)) | Developer | The game: code, gameplay, physics, and level system |
+| **Gabriel C. Bognot** ([@gabbogs](https://github.com/gabbogs)) | Designer | UI screens, Level 2 map, and the browser version |
 
 - **UI screens:** main menu, pause, game over, and level complete
 - **Level 2 map:** drawn pixel by pixel in GIMP
