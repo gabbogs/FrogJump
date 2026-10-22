@@ -11,7 +11,7 @@ public class Game implements Runnable {
 	private GameWindow gameWindow;
 	private GamePanel gamePanel;
 	private Thread gameThread;
-	private final int FPS_SET;
+	private final int FPS_SET = 120;
 	private final int UPS_SET = 200;
 	// Most updates to run in one loop pass when catching up after a slow frame
 	private static final int MAX_CATCH_UP = 10;
@@ -28,13 +28,11 @@ public class Game implements Runnable {
 	public final static int GAME_WIDTH = TILES_SIZE * TILES_IN_WIDTH;
 	public final static int GAME_HEIGHT = TILES_SIZE * TILES_IN_HEIGHT;
 
-	public Game(boolean web, boolean showPerf) {
-		// Browsers refresh at 60 Hz, so drawing more often there only costs time
-		FPS_SET = web ? 60 : 120;
+	public Game(boolean showPerf) {
 		this.showPerf = showPerf;
 		initClasses();
-		gamePanel = new GamePanel(this, web);
-		gameWindow = new GameWindow(gamePanel, web);
+		gamePanel = new GamePanel(this);
+		gameWindow = new GameWindow(gamePanel);
 		gamePanel.setFocusable(true);
 		gamePanel.requestFocus();
 		startGameLoop();
@@ -123,8 +121,7 @@ public class Game implements Runnable {
 				lastCheck = System.currentTimeMillis();
 			}
 
-			// Sleep until the next frame is due instead of spinning. Waking up rarely matters most in the
-			// browser, where every wake-up competes with drawing for the page's single main thread.
+			// Sleep until the next frame is due instead of spinning, so the game loop barely uses the CPU
 			long sleepMs = (long) ((1 - deltaF) * timePerFrame / 1000000);
 			try {
 				Thread.sleep(Math.max(1, sleepMs));

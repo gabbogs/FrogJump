@@ -5,8 +5,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 
 // Shared look for the in-game panels (apple counter, volume slider): the pause menu's colors and
-// frame style, plus a tiny pixel font for numbers. Sizes are multiples of 2 so they stay crisp
-// in the browser, where frames are drawn at half resolution.
+// frame style, plus a tiny pixel font for numbers.
 public class PixelUi {
 
 	public static final Color DARK = new Color(51, 50, 61);

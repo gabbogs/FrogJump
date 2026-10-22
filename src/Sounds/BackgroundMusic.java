@@ -3,7 +3,7 @@ package Sounds;
 import javax.sound.sampled.Clip;
 
 // Looping background music. The track is loaded on a background thread so it never delays the
-// game starting (it's the largest file, especially in the browser); start/stop calls made before
+// game starting (it is the largest file); start/stop calls made before
 // it finishes loading are remembered and applied once it's ready.
 public class BackgroundMusic {
 	private volatile Clip clip;

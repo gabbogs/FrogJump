@@ -10,7 +10,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 
-// Loads sound effects from the classpath (/sfx/...) so they work from a JAR and in a browser.
+// Loads sound effects from the classpath (/sfx/...) so they work from a JAR.
 // Returns null instead of throwing when audio is unavailable, so the game keeps running silently.
 // Also holds the game's volume, which applies to every loaded sound.
 public class SoundLoader {

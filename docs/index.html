@@ -4,9 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>FrogJump · Play in browser</title>
-  <meta name="description" content="Play FrogJump, a 2D Java platformer: collect apples, avoid spikes." />
+  <meta name="description" content="Play FrogJump, a 2D platformer: collect apples, avoid spikes." />
   <meta property="og:title" content="FrogJump" />
-  <meta property="og:description" content="A 2D Java platformer you can play in your browser. Collect apples, avoid spikes." />
+  <meta property="og:description" content="A 2D platformer you can play in your browser. Collect apples, avoid spikes." />
   <meta property="og:image" content="preview.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,9 +15,9 @@
     :root { --ink: #f4f4f5; --muted: #a0a0a8; --line: #2a2a30; }
     * { box-sizing: border-box; }
     html, body { margin: 0; height: 100%; overflow: hidden; background: #000; color: var(--ink); font-family: "Geist Mono", monospace; }
-    /* The game fills the whole window; it scales itself to fit and follows size changes (see GamePanel) */
+    /* The game fills the whole window (see game.js) */
     #stage { position: fixed; inset: 0; }
-    #display { position: absolute; inset: 0; }
+    #game { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
     .overlay {
       position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
       font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); line-height: 2.2;
@@ -25,8 +25,8 @@
     }
     .overlay[hidden] { display: none; }
     #hint { place-items: start center; padding-top: 12px; transition: opacity .4s; }
-    #hint div { background: rgba(0, 0, 0, .7); border: 1px solid var(--line); border-radius: 8px; padding: 10px 18px; }
-    #hint strong { color: var(--ink); font-weight: 400; }
+    #hint div, #quit div { background: rgba(0, 0, 0, .7); border: 1px solid var(--line); border-radius: 8px; padding: 10px 18px; }
+    #hint strong, #quit strong { color: var(--ink); font-weight: 400; }
     kbd { border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; color: var(--ink); }
     .corner { position: fixed; top: 10px; right: 12px; display: flex; gap: 8px; }
     .corner a, .corner button {
@@ -40,13 +40,16 @@
 </head>
 <body>
   <div id="stage">
-    <div id="display"></div>
-    <div id="loading" class="overlay">Loading the Java runtime…<br />(the first visit can take up to a minute)</div>
+    <canvas id="game" width="1664" height="896"></canvas>
+    <div id="loading" class="overlay">Loading…</div>
     <div id="hint" class="overlay" hidden>
       <div>
-        <strong>Click the game to play</strong><br />
-        <kbd>Enter</kbd> start · <kbd>A</kbd> <kbd>D</kbd> move · <kbd>W</kbd> / <kbd>Space</kbd> jump · <kbd>Esc</kbd> pause · <kbd>M</kbd> mute
+        <strong>Click Play or press Enter</strong><br />
+        <kbd>A</kbd> <kbd>D</kbd> move · <kbd>W</kbd> / <kbd>Space</kbd> jump · <kbd>Esc</kbd> pause · <kbd>M</kbd> mute
       </div>
+    </div>
+    <div id="quit" class="overlay" hidden>
+      <div><strong>Thanks for playing!</strong><br />Click anywhere to go back to the menu</div>
     </div>
     <div class="corner">
       <button id="fullscreen" type="button" hidden>Fullscreen</button>
@@ -54,33 +57,22 @@
     </div>
   </div>
 
-  <script src="https://cjrtnc.leaningtech.com/4.2/loader.js"></script>
   <script>
     const stage = document.getElementById("stage");
     const hint = document.getElementById("hint");
     const fsButton = document.getElementById("fullscreen");
 
-    // The game fills the window; true fullscreen is optional, from the corner button
-    function goFullscreen() {
+    // True fullscreen is optional, from the corner button
+    fsButton.addEventListener("click", () => {
       if (!document.fullscreenElement && stage.requestFullscreen) stage.requestFullscreen().catch(() => {});
-    }
-    // The first click on the game gives it keyboard focus; the hint isn't needed after that
-    stage.addEventListener("pointerdown", (e) => {
-      if (!e.target.closest(".corner")) hint.style.opacity = 0;
-    }, { capture: true });
-    fsButton.addEventListener("click", goFullscreen);
+    });
     if (document.fullscreenEnabled) fsButton.hidden = false;
 
-    (async () => {
-      await cheerpjInit({ status: "none" });
-      // Size the Java "screen" to the stage; the game scales itself to fit (see GamePanel)
-      cheerpjCreateDisplay(-1, -1, document.getElementById("display"));
-      document.getElementById("loading").remove();
-      hint.hidden = false;
-      // CheerpJ maps /app/ to the site's root, so build the JAR path from this page's location
-      const dir = location.pathname.replace(/[^/]*$/, "");
-      await cheerpjRunJar("/app" + dir + "frogjump.jar", "--web");
-    })();
+    // The hint isn't needed once someone starts playing
+    const hideHint = (e) => { if (!e.target.closest || !e.target.closest(".corner")) hint.style.opacity = 0; };
+    stage.addEventListener("pointerdown", hideHint, { capture: true });
+    window.addEventListener("keydown", hideHint, { once: true });
   </script>
+  <script src="game.js"></script>
 </body>
 </html>

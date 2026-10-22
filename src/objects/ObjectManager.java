@@ -94,7 +94,7 @@ public class ObjectManager {
 	private void drawAppleCounter(Graphics g) {
 		int textSize = 6;
 		String text = "x" + applesLeft;
-		// 4x keeps the apple's pixels whole at the browser's half resolution
+		// The apple sprite at 4x, the same pixel size as the digits
 		int iconW = appleIcon.getWidth() * 4, iconH = appleIcon.getHeight() * 4;
 		int frame = 4 * PixelUi.P, pad = 6;
 		// Right of the mute button (see ui.MuteButton)

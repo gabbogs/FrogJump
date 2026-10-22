@@ -61,7 +61,7 @@ public class LoadSave {
 	}
 
 	// Loads /lvls/1.png, /lvls/2.png, ... from the classpath until one is missing.
-	// Reading from the classpath (not the file system) lets the game run from a JAR or in a browser.
+	// Reading from the classpath (not the file system) lets the game run from a JAR.
 	public static BufferedImage[] GetAllLevels() {
 		List<BufferedImage> levels = new ArrayList<>();
 		for (int i = 1; ; i++) {
